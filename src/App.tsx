@@ -1,45 +1,68 @@
 import { useEffect, useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
+import { format } from "date-fns";
 import "./App.css";
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+} from "recharts";
 
-const getGreeting = async function () {
-  const res = await fetch("/api/test");
-  return await res.json();
+type Recall = {
+  id: number;
+  data: string;
+  recall: number;
 };
 
 function App() {
-  const [count, setCount] = useState(0);
-  const [greeting, setGreeting] = useState(""); // Add this
+  const [data, setData] = useState<Array<Recall>>([]);
+  const [error, setError] = useState("");
+
+  const searchParams = new URLSearchParams(window.location.search);
+  const startDate = searchParams.get("from_ts");
+  const endDate = searchParams.get("to_ts");
 
   useEffect(() => {
-    // Add this hook
-    getGreeting().then((res) => setGreeting(res.greeting));
-  }, []);
+    const route = `/recall?${startDate ? "from_ts=" + startDate : ""}${
+      endDate ? "&to_ts=" + endDate : ""
+    }`;
+
+    fetch(route)
+      .then((response) => {
+        if (response.status !== 200) {
+          setError(response.statusText);
+
+          return;
+        }
+
+        return response.json();
+      })
+      .then((data) => setData(data));
+  }, [endDate, startDate]);
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-      <p>Server response: {greeting}</p>
+      <h1>Superwise Home Assignment</h1>
+
+      {error ? (
+        <p style={{ color: "red" }}>{error}</p>
+      ) : (
+        <ResponsiveContainer height={300} width="100%">
+          <LineChart width={500} height={300} data={data}>
+            <CartesianGrid />
+            <XAxis
+              dataKey="date"
+              tickFormatter={(date) => {
+                return format(new Date(date), "yyyy-MM-dd");
+              }}
+            />
+            <YAxis />
+            <Line type="monotone" dataKey="recall" stroke="blue" />
+          </LineChart>
+        </ResponsiveContainer>
+      )}
     </>
   );
 }
