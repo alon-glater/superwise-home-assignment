@@ -1,10 +1,21 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from "react";
+import reactLogo from "./assets/react.svg";
+import viteLogo from "/vite.svg";
+import "./App.css";
+
+const getGreeting = async function () {
+  const res = await fetch("/api/test");
+  return await res.json();
+};
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(0);
+  const [greeting, setGreeting] = useState(""); // Add this
+
+  useEffect(() => {
+    // Add this hook
+    getGreeting().then((res) => setGreeting(res.greeting));
+  }, []);
 
   return (
     <>
@@ -28,8 +39,9 @@ function App() {
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
+      <p>Server response: {greeting}</p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
