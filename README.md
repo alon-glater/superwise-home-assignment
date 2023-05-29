@@ -7,7 +7,7 @@ Assuming that you have `npm` installed, simply run the next lines:
 1. `npm install`
 2. `npm run dev`
 
-Then, simply navigate to the URL suggested in the console (i.e. `http://127.0.0.1:5173/`).
+Then, simply navigate to the URL suggested in the console (i.e. `http://127.0.0.1:PORT/`).
 
 ## How to Filter
 
